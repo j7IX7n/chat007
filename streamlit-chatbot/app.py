@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI  # If Goouq uses OpenAI-compatible SDK
+import openai # For openai version 0.28.1
 
 # Debug: Verify secrets load
 st.title("🤖 Goouq Chatbot")
@@ -7,10 +7,10 @@ st.write("Secrets loaded:", list(st.secrets.keys()))
 
 # Initialize client
 try:
-    client = OpenAI(
-        api_key=st.secrets["GOOUQ_API_KEY"],
-        base_url="https://api.goouq.com/v1"  # Replace with Goouq's API URL
-    )
+    client = openai.OpenAI( # Note the 'openai.' prefix
+    api_key=st.secrets["GOOUQ_API_KEY"],
+    base_url="https://api.goouq.com/v1"
+)
 except KeyError:
     st.error("Missing GOOUQ_API_KEY in secrets.toml!")
     st.stop()
