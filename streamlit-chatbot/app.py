@@ -1,5 +1,5 @@
 import streamlit as st
-import openai # For openai version 0.28.1
+import openai 
 
 # Debug: Verify secrets load
 st.title("🤖 Goouq Chatbot")
@@ -7,7 +7,7 @@ st.write("Secrets loaded:", list(st.secrets.keys()))
 
 # Initialize client
 try:
-    client = openai.OpenAI( # Note the 'openai.' prefix
+    client = openai.OpenAI( # Now, access OpenAI as an attribute of the imported openai module
     api_key=st.secrets["GOOUQ_API_KEY"],
     base_url="https://api.goouq.com/v1"
 )
