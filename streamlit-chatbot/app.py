@@ -1,55 +1,76 @@
 import streamlit as st
-import openai 
+import openai # Now we just import the module
 
-# Debug: Verify secrets load
 st.title("🤖 Goouq Chatbot")
+
+# Debug: Verify secrets load (already working, good!)
 st.write("Secrets loaded:", list(st.secrets.keys()))
 
-# Initialize client
+# --- Configuration for openai==0.28.1 ---
 try:
-    client = openai.OpenAI( # Now, access OpenAI as an attribute of the imported openai module
-    api_key=st.secrets["GOOUQ_API_KEY"],
-    base_url="https://api.goouq.com/v1"
-)
-except KeyError:
-    st.error("Missing GOOUQ_API_KEY in secrets.toml!")
-    st.stop()
+    # Set the API key
+    openai.api_key = st.secrets["GOOUQ_API_KEY"]
 
-# Chat history
+    # Set the API base URL (Goouq's API endpoint)
+    openai.api_base = "https://api.goouq.com/v1"
+
+except KeyError:
+    st.error("Error: GOOUQ_API_KEY not found in Streamlit secrets. Please add it.")
+    st.stop() # Stop the app if API key is missing
+except Exception as e:
+    st.error(f"An unexpected error occurred during API configuration: {e}")
+    st.stop()
+# --- End Configuration ---
+
+
+# Initialize chat history (if not already done)
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display messages
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# User input
-if prompt := st.chat_input("Ask me anything"):
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    # Display user message
+    # Display user message in chat message container
     with st.chat_message("user"):
-        st.write(prompt)
-    
-    # Get Goouq response
+        st.markdown(prompt)
+
     with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+
+        # --- API Call using openai.ChatCompletion for 0.28.1 ---
         try:
-            response = client.chat.completions.create(
-                model="goouq-model-name",  # Replace with actual model name
-                messages=st.session_state.messages,
-                stream=True
+            response = openai.ChatCompletion.create( # Use ChatCompletion for chat models
+                model="goouq-model-name", # Replace with the actual model name Goouq expects
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+                stream=True,
             )
-            
-            full_response = ""
-            message_placeholder = st.empty()
+
+            # Iterate through the stream to display response
             for chunk in response:
-                if chunk.choices[0].delta.content:
-                    full_response += chunk.choices[0].delta.content
-                    message_placeholder.markdown(full_response + "▌")
-            
+                full_response += chunk.choices[0].delta.get("content", "")
+                message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-            
+
+        except openai.error.AuthenticationError:
+            st.error("Authentication failed. Please check your GOOUQ_API_KEY in Streamlit secrets.")
+            full_response = "Authentication error. Please check your API key."
+        except openai.error.APIError as e:
+            st.error(f"Goouq API Error: {e}")
+            full_response = f"Goouq API error: {e}"
         except Exception as e:
-            st.error(f"API Error: {str(e)}")
+            st.error(f"An unexpected error occurred during API call: {e}")
+            full_response = f"An unexpected error occurred: {e}"
+        # --- End API Call ---
+
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
