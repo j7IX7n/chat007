@@ -12,7 +12,7 @@ try:
     openai.api_key = st.secrets["GOOUQ_API_KEY"]
 
     # Set the API base URL (Goouq's API endpoint)
-    openai.api_base = "https://api.goouq.com/v1"
+    openai.api_base = "https://api.groq.com/openai/v1"
 
 except KeyError:
     st.error("Error: GOOUQ_API_KEY not found in Streamlit secrets. Please add it.")
@@ -47,7 +47,7 @@ if prompt := st.chat_input("What is up?"):
         # --- API Call using openai.ChatCompletion for 0.28.1 ---
         try:
             response = openai.ChatCompletion.create( # Use ChatCompletion for chat models
-                model="goouq-model-name", # Replace with the actual model name Goouq expects
+                model="llama3-8b-8192", # Replace with the actual model name Goouq expects
                 messages=[
                     {"role": m["role"], "content": m["content"]}
                     for m in st.session_state.messages
