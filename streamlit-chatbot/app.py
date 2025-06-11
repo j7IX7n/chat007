@@ -3,9 +3,6 @@ import openai # Now we just import the module
 
 st.title("🤖 Goouq Chatbot")
 
-# Debug: Verify secrets load (already working, good!)
-st.write("Secrets loaded:", list(st.secrets.keys()))
-
 # --- Configuration for openai==0.28.1 ---
 try:
     # Set the API key
