@@ -272,7 +272,7 @@ elif st.session_state["app_mode"] == "Chat":
 
         with st.chat_message("assistant", avatar="🫒"):
             stream = openai.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=messages_for_api,
                 stream=True,
             )
@@ -323,7 +323,7 @@ elif st.session_state["app_mode"] == "Study":
 
         with st.chat_message("assistant", avatar="🫒"):
             stream = openai.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=messages_for_api,
                 stream=True,
             )
