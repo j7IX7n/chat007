@@ -1,18 +1,18 @@
 import streamlit as st
 import openai # Now we just import the module
 
-st.title("🤖 Goouq Chatbot")
+st.title("🫒live") # Your new chatbot name and emoji!
 
 # --- Configuration for openai==0.28.1 ---
 try:
     # Set the API key
-    openai.api_key = st.secrets["GOOUQ_API_KEY"]
+   openai.api_key = st.secrets["GROQ_API_KEY"]
 
     # Set the API base URL (Goouq's API endpoint)
-    openai.api_base = "https://api.groq.com/openai/v1"
+   openai.api_base = "https://api.groq.com/openai/v1"
 
 except KeyError:
-    st.error("Error: GOOUQ_API_KEY not found in Streamlit secrets. Please add it.")
+    st.error("Error: GROQ_API_KEY not found in Streamlit secrets. Please add your Groq API key.")
     st.stop() # Stop the app if API key is missing
 except Exception as e:
     st.error(f"An unexpected error occurred during API configuration: {e}")
@@ -21,12 +21,22 @@ except Exception as e:
 
 
 # Initialize chat history (if not already done)
+# Initialize chat history (if not already done)
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Howdy! I'm 🫒live, a part-time chatbot. Is there any issue i mayy help you with?"}
+    ]
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    # --- MODIFIED AVATAR LOGIC ---
+    if message["role"] == "user":
+        avatar_icon = "👤" # A generic person icon for the user
+    else: # message["role"] == "assistant"
+        avatar_icon = "🫒" # Your olive emoji for the chatbot!
+    # --- END MODIFIED AVATAR LOGIC ---
+
+    with st.chat_message(message["role"], avatar=avatar_icon): # Pass the avatar here
         st.markdown(message["content"])
 
 # Accept user input
@@ -37,7 +47,7 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🫒"): 
         message_placeholder = st.empty()
         full_response = ""
 
