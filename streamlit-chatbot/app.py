@@ -5,7 +5,7 @@ st.title("🫒live") # Your new chatbot name and emoji!
 
 # --- Configuration for openai==0.28.1 ---
 try:
-    # Set the API key
+    # Set the API key1
    openai.api_key = st.secrets["GROQ_API_KEY"]
 
     # Set the API base URL (Goouq's API endpoint)
