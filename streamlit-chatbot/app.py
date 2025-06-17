@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import uuid
-import random
+import random # For potential game logic later
 
 # --- Configuration for Groq API ---
 try:
@@ -12,7 +12,7 @@ except KeyError:
     st.stop()
 
 # --- Streamlit Page Configuration ---
-st.set_page_config(page_title="🫒live", layout="centered")
+st.set_page_config(page_title="🫒live Chatbot", layout="centered")
 
 # --- Initialize Session State Variables ---
 if "messages" not in st.session_state:
@@ -184,7 +184,7 @@ with st.sidebar:
 
     # Current Avatar Display (only visible when a mode is active)
     if st.session_state["app_mode"] != "Home":
-        st.subheader("Your Buddy:)")
+        st.subheader("Your Avatar") # Changed from "Your Buddy:)"
         st.markdown(f'<div style="font-size: 50px; text-align: center;">{st.session_state["user_avatar"]}</div>', unsafe_allow_html=True)
         if st.button("Change Friend", key="change_avatar_sidebar"):
             st.session_state["app_mode"] = "Home"
@@ -232,7 +232,7 @@ if st.session_state["app_mode"] == "Home":
     st.markdown("### Or pick from these:")
 
     # Grid of common emojis as buttons
-    common_emojis = ["😀", "😊", "🥳", "😎", "👾", "🤖", "🚀", "😺", "🐶", "🦉", "🦁", "🦄", "🌈", "☀️", "🌟", "💡", "🍔", "🍕", "🎈", "📚", "🧪", "📐", "🗺️", "🗣️"]
+    common_emojis = ["😀", "😊", "🥳", "😎", "👾", "🤖", "🚀", "�", "🐶", "🦉", "🦁", "🦄", "🌈", "☀️", "🌟", "💡", "🍔", "🍕", "🎈", "📚", "🧪", "📐", "🗺️", "🗣️"]
     
     cols = st.columns(6) # Adjust number of columns as needed
     for i, emoji in enumerate(common_emojis):
@@ -272,7 +272,7 @@ elif st.session_state["app_mode"] == "Chat":
 
         with st.chat_message("assistant", avatar="🫒"):
             stream = openai.chat.completions.create(
-                model="llama3-70b-8192",
+                model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
             )
@@ -286,9 +286,6 @@ elif st.session_state["app_mode"] == "Study":
 
     # Select Study Topic
     st.subheader("What do you want to learn today?")
-    # The `p` within `st-emotion-cache-v01mih` is the target for text color
-    # This change specifically sets the text color for these radio buttons
-    # in the main content area to be dark, ensuring visibility.
     study_topic = st.radio(
         "Choose a subject:",
         ("Science", "Maths", "Social Studies", "Language"),
@@ -323,7 +320,7 @@ elif st.session_state["app_mode"] == "Study":
 
         with st.chat_message("assistant", avatar="🫒"):
             stream = openai.chat.completions.create(
-                model="llama3-70b-8192",
+                model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
             )
