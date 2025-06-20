@@ -2,4 +2,3 @@ streamlit
 openai==1.86.0
 groq
 python-dotenv
-firebase-admin
