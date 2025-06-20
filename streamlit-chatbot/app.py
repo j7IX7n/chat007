@@ -173,10 +173,27 @@ st.markdown(
         background-color: var(--olive-accent);
         border-color: var(--olive-dark);
     }
-    /* Hide the default Streamlit header/footer for a cleaner initial look */
+   /* Hide the default Streamlit header/footer for a cleaner initial look */
     header { visibility: hidden; }
     footer { visibility: hidden; }
     .st-emotion-cache-z5fcl4 { padding-top: 2rem; } /* Adjust top padding if header is hidden */
+
+    /* >>> START OF NEW CSS FOR SIDEBAR ICON VISIBILITY <<< */
+    [data-testid="stSidebarExpander"] {
+        color: var(--text-dark) !important; /* Force a dark color for the icon */
+        background-color: var(--cream-white) !important; /* Give it a contrasting background */
+        border-radius: 50%; /* Make it circular */
+        padding: 5px; /* Add some padding */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Add shadow for prominence */
+        top: 0.5rem; /* Adjust vertical position slightly */
+        left: 0.5rem; /* Adjust horizontal position slightly */
+        z-index: 1000; /* Ensure it's on top of other elements */
+    }
+    [data-testid="stSidebarExpander"] svg {
+        fill: var(--text-dark) !important; /* Ensure the SVG icon itself is also dark */
+    }
+    /* >>> END OF NEW CSS FOR SIDEBAR ICON VISIBILITY <<< */
+
     </style>
     """,
     unsafe_allow_html=True
