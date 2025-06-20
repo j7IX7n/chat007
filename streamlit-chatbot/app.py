@@ -1,5 +1,4 @@
 import streamlit as st
-# import openai # Removed as we'll use the specific Groq client
 from groq import Groq # Import the Groq client
 import uuid
 import random # For potential game logic later
@@ -253,6 +252,7 @@ if st.session_state["app_mode"] == "Home":
     if st.button("Start Chat!", type="primary", use_container_width=True, key="start_chat_btn"):
         st.session_state["avatar_chosen"] = True
         st.session_state["app_mode"] = "Chat" # Automatically switch to Chat mode after choosing avatar
+        st.session_state["current_chat_messages"] = [] # Clear chat history if changing avatar
         st.rerun() # Rerun to switch to chat mode
 
 # --- Chat with Bot Section ---
@@ -277,14 +277,24 @@ elif st.session_state["app_mode"] == "Chat":
         ]
 
         with st.chat_message("assistant", avatar="🫒"):
-            # THIS IS THE CRUCIAL CHANGE FOR THE API CALL
-            stream = client.chat.completions.create( 
+            # Create a placeholder for streamed response
+            placeholder = st.empty()
+            full_response_content = ""
+            # Make the API call to Groq
+            stream = client.chat.completions.create(
                 model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
             )
-            response = st.write_stream(stream)
-        st.session_state["current_chat_messages"].append({"role": "assistant", "content": response})
+            # Iterate over the stream and update the placeholder
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    full_response_content += chunk.choices[0].delta.content
+                    placeholder.markdown(full_response_content + "▌") # Add blinking cursor for effect
+
+            placeholder.markdown(full_response_content) # Display final content without cursor
+        st.session_state["current_chat_messages"].append({"role": "assistant", "content": full_response_content})
+
 
 # --- Study Time Section ---
 elif st.session_state["app_mode"] == "Study":
@@ -326,14 +336,23 @@ elif st.session_state["app_mode"] == "Study":
                            [{"role": m["role"], "content": m["content"]} for m in st.session_state["study_messages"][study_topic]]
 
         with st.chat_message("assistant", avatar="🫒"):
-            # THIS IS THE CRUCIAL CHANGE FOR THE API CALL
-            stream = client.chat.completions.create( 
+            # Create a placeholder for streamed response
+            placeholder = st.empty()
+            full_response_content = ""
+            # Make the API call to Groq
+            stream = client.chat.completions.create(
                 model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
             )
-            response = st.write_stream(stream)
-        st.session_state["study_messages"][study_topic].append({"role": "assistant", "content": response})
+            # Iterate over the stream and update the placeholder
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    full_response_content += chunk.choices[0].delta.content
+                    placeholder.markdown(full_response_content + "▌") # Add blinking cursor for effect
+
+            placeholder.markdown(full_response_content) # Display final content without cursor
+        st.session_state["study_messages"][study_topic].append({"role": "assistant", "content": full_response_content})
 
 
 # --- Game Corner Section ---
