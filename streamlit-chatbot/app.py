@@ -1,15 +1,21 @@
 import streamlit as st
-import openai
+# import openai # Removed as we'll use the specific Groq client
+from groq import Groq # Import the Groq client
 import uuid
 import random # For potential game logic later
 
 # --- Configuration for Groq API ---
+# Initialize the Groq client using your secret API key
 try:
-    openai.api_key = st.secrets["GROQ_API_KEY"]
-    openai.api_base = "https://api.groq.com/openai/v1"
+    # We no longer set openai.api_key or openai.api_base globally.
+    # Instead, we create a 'client' instance from the 'groq' library.
+    client = Groq( # THIS IS THE CRUCIAL CHANGE FOR INITIALIZATION
+        api_key=st.secrets["GROQ_API_KEY"],
+    )
 except KeyError:
     st.error("Error: GROQ_API_KEY not found in Streamlit secrets. Please add your Groq API key.")
     st.stop()
+# No need for openai.api_base here, the Groq client automatically sets it to https://api.groq.com/openai/v1
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(page_title="🫒live Chatbot", layout="centered")
@@ -232,8 +238,8 @@ if st.session_state["app_mode"] == "Home":
     st.markdown("### Or pick from these:")
 
     # Grid of common emojis as buttons
-    common_emojis = ["😀", "😊", "🥳", "😎", "👾", "🤖", "🚀", "�", "🐶", "🦉", "🦁", "🦄", "🌈", "☀️", "🌟", "💡", "🍔", "🍕", "🎈", "📚", "🧪", "📐", "🗺️", "🗣️"]
-    
+    common_emojis = ["😀", "😊", "🥳", "😎", "👾", "🤖", "🚀", "😺", "🐶", "🦉", "🦁", "🦄", "🌈", "☀️", "🌟", "💡", "🍔", "🍕", "🎈", "📚", "🧪", "📐", "🗺️", "🗣️"]
+
     cols = st.columns(6) # Adjust number of columns as needed
     for i, emoji in enumerate(common_emojis):
         with cols[i % 6]:
@@ -271,7 +277,8 @@ elif st.session_state["app_mode"] == "Chat":
         ]
 
         with st.chat_message("assistant", avatar="🫒"):
-            stream = openai.chat.completions.create(
+            # THIS IS THE CRUCIAL CHANGE FOR THE API CALL
+            stream = client.chat.completions.create( 
                 model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
@@ -314,12 +321,13 @@ elif st.session_state["app_mode"] == "Study":
 
         # Build messages for API with a system prompt for the tutor
         system_prompt = f"You are a kind, patient, and knowledgeable tutor for kids learning about {study_topic}. Explain concepts clearly, use simple language, and provide examples. Keep responses concise and engaging for a young audience. If the question is not about {study_topic}, gently guide them back."
-        
+
         messages_for_api = [{"role": "system", "content": system_prompt}] + \
                            [{"role": m["role"], "content": m["content"]} for m in st.session_state["study_messages"][study_topic]]
 
         with st.chat_message("assistant", avatar="🫒"):
-            stream = openai.chat.completions.create(
+            # THIS IS THE CRUCIAL CHANGE FOR THE API CALL
+            stream = client.chat.completions.create( 
                 model="llama3-70b-8192", # Updated model
                 messages=messages_for_api,
                 stream=True,
